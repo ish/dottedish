@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+dottedish/__init__.py
+dottedish.egg-info/PKG-INFO
+dottedish.egg-info/SOURCES.txt
+dottedish.egg-info/dependency_links.txt
+dottedish.egg-info/entry_points.txt
+dottedish.egg-info/top_level.txt
+dottedish.egg-info/zip-safe
