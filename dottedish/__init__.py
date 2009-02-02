@@ -240,6 +240,27 @@ def _get(d, dottedkey):
                        (dottedkey, key))
     return d
     
+def _delitem(d, dottedkey):
+    """ get a dottedkey value from a dottedict """
+    keys = str(dottedkey).split('.')
+    K_parts = []
+    for n, key in enumerate(keys):
+        K_parts.append(key)
+        K = '.'.join(K_parts)
+        try:
+            if n == len(keys)-1:
+                del d[try_int(K)]
+                K_parts = []
+            else:
+                d = d[try_int(K)]
+                K_parts = []
+        except (KeyError, TypeError), e:
+            pass
+    if K_parts != []:
+        raise KeyError( \
+            'Error accessing dotted key %s - key %s does not exist'% \
+                       (dottedkey, key))
+
 def _has_key(d, dottedkey):
     """ Does the dict have this dottedkey """
     try:
@@ -278,6 +299,9 @@ class dotted(object):
             return dotted(d)
         else:
             return d
+
+    def __delitem__(self, dottedkey):
+        _delitem(self.data, dottedkey)
         
     def __setitem__(self, dottedkey, value):
         """ implement the dict setitem """
