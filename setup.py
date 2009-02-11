@@ -5,7 +5,7 @@ version = '0.5'
 
 setup(name='dottedish',
       version=version,
-      description="",
+      description="A dotted key accessor that handles numeric keys for list entries",
       long_description="""\
 """,
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
