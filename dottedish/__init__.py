@@ -22,7 +22,7 @@ def try_int(v):
     except ValueError:
         return v
     
-def _setDict(data, keys, value, overwrite=False):
+def _set_dict(data, keys, value, overwrite=False):
     """
     Given a dotted, sets a new value based on a list of keys
     """
@@ -68,13 +68,13 @@ def _setDict(data, keys, value, overwrite=False):
                     # a list...
                     if len(data) == 0:
                         data = [{}]
-                    d = _setDict(data[try_int(keys[0])], \
+                    d = _set_dict(data[try_int(keys[0])], \
                                  keys[1:], value, overwrite=overwrite) 
                 if len(data)>try_int(keys[0]):
-                    d = _setDict(data[try_int(keys[0])], \
+                    d = _set_dict(data[try_int(keys[0])], \
                                  keys[1:], value, overwrite=overwrite) 
                 elif len(data) == try_int(keys[0]):
-                    o = _setDict({}, keys[1:], value, overwrite=overwrite)
+                    o = _set_dict({}, keys[1:], value, overwrite=overwrite)
                     data.append( o )
                     d = o
                 else:
@@ -86,7 +86,7 @@ def _setDict(data, keys, value, overwrite=False):
              data.has_key(keys[0]) and not \
               isinstance(data[keys[0]],dict) and overwrite is True:
                 data[keys[0]] = {}
-            d = _setDict(_setdefault(data, keys[0], {}), \
+            d = _set_dict(_setdefault(data, keys[0], {}), \
                          keys[1:], value, overwrite=overwrite)
         data[try_int(keys[0])] = d
     return data
@@ -116,7 +116,7 @@ def keysort(a, b):
     return 0
                     
 
-def _getDictFromDottedKeyDict(d, noexcept=False):
+def get_dict_from_dotted_dict(d, noexcept=False):
     """
     Given a dictionary - creates a dotteddict
     """
@@ -139,7 +139,7 @@ def _getDictFromDottedKeyDict(d, noexcept=False):
                 value = data[dottedkey]
             del data[dottedkey]
             try:
-                data = _setDict(data, keys, value, overwrite=noexcept)
+                data = _set_dict(data, keys, value, overwrite=noexcept)
             except KeyError:
                 if noexcept is True:
                     pass
@@ -188,7 +188,7 @@ def _setdefault(data, dottedkey, default=NOARG):
     
     if K is None:
         # if we didn't find a K then we have a new var to set
-        data = _setDict(data, keys, default)
+        data = _set_dict(data, keys, default)
     else:
         # We should have a K for which the last segment doesn't exist
         if isinstance(lastleaf, dict) and \
@@ -196,12 +196,12 @@ def _setdefault(data, dottedkey, default=NOARG):
             _set(data, lastkey, [])
             lastleaf = _get(data, lastkey)
         if isinstance(lastleaf, list) and try_int(keys[n]) == len(lastleaf):
-            lastleaf.append(_setDict({}, keys[n+1:], default))
+            lastleaf.append(_set_dict({}, keys[n+1:], default))
         else:
             if lastleaf == data:
-                data = _setDict(data, keys, default)
+                data = _set_dict(data, keys, default)
             else:
-                _setDict(lastleaf, restofkeys, default)
+                _set_dict(lastleaf, restofkeys, default)
 
             
     return _get(data, dottedkey)
@@ -279,7 +279,7 @@ class dotted(object):
             if isinstance(value, dotted):
                 self.data = value.data
             else:
-                self.data = _getDictFromDottedKeyDict(value)
+                self.data = get_dict_from_dotted_dict(value)
             
     def get(self, dottedkey, default=None):
         """ Get the dottedkey """
