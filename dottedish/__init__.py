@@ -363,6 +363,9 @@ class dotted(object):
     def __eq__(self, other):
         """ compare with another dictionary """
         return self.data == dotted(other).data
+    def __ne__(self, other):
+        """ compare with another dictionary """
+        return self.data != dotted(other).data
     
 
     def setdefault(self, dottedkey, default=NOARG):

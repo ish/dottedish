@@ -1,4 +1,4 @@
-setup.cfg
+README
 setup.py
 dottedish/__init__.py
 dottedish.egg-info/PKG-INFO
