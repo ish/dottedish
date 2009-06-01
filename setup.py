@@ -25,8 +25,10 @@ setup(name='dottedish',
       zip_safe=True,
       install_requires=[
           # -*- Extra requirements: -*-
+          "WebOb",
       ],
       entry_points="""
       # -*- Entry points: -*-
       """,
+      test_suite="dottedish.tests"
       )
