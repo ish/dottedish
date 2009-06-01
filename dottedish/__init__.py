@@ -120,23 +120,22 @@ def get_dict_from_dotted_dict(d, noexcept=False):
     """
     Given a dictionary - creates a dotteddict
     """
-    if isinstance(d, MultiDict) or isinstance(d, UnicodeMultiDict):
-        data = copy_multi_dict(d)
-    else:
-        data = d
+    data = d
     if isinstance(d, list):
-        return d
+        raise ValueError
     keyslist = [key.split('.') for key in data.keys()]
     keyslist.sort(keysort)
     for keys in keyslist:
         if len(keys) > 1:
             dottedkey = '.'.join(keys)
-            if not data.has_key(dottedkey):
+            if not is_int(dottedkey) and not data.has_key(dottedkey):
                 continue
+            if is_int(dottedkey) and int(dottedkey)<len(data):
+                continue 
             if hasattr(data,'getall'):
                 value = data.getall(dottedkey)
             else:
-                value = data[dottedkey]
+                value = data[try_int(dottedkey)]
             del data[dottedkey]
             try:
                 data = _set_dict(data, keys, value, overwrite=noexcept)
@@ -149,6 +148,46 @@ def get_dict_from_dotted_dict(d, noexcept=False):
             if hasattr(data,'getall'):
                 data[keys[0]] = data.getall(keys[0])
     return data
+
+def get_dict_from_dotted_list(d, noexcept=False):
+    """
+    Given a dotted dictionary with integer top level keys, create a real list
+    """
+    out = []
+    keyslist = [key.split('.') for key in d.keys()]
+    keyslist.sort(keysort)
+    dottedkeyslist = ['.'.join(k) for k in keyslist]
+    numeric_keys = list(set([key[0] for key in keyslist]))
+    numeric_keys.sort()
+    
+    len_list = try_int(numeric_keys[-1])
+    for key in numeric_keys:
+        subdict = {}
+        for k in dottedkeyslist:
+            if k.startswith(key):
+                if '.' in k:
+                    subkey = '.'.join(k.split('.')[1:])
+                    subdict[subkey] = d[k]
+                else:
+                    subdict=d[k]
+
+        if isinstance(subdict, dict):
+            out.append(get_dict_from_dotted(subdict))
+        else:
+            out.append(subdict)
+    return out
+
+def get_dict_from_dotted(value, noexcept=False):
+    if isinstance(value, MultiDict) or isinstance(value, UnicodeMultiDict):
+        value = copy_multi_dict(value)
+    if isinstance(value, dict):
+        if len(value.keys())>0 and is_int(value.keys()[0].split('.')[0]):
+            return get_dict_from_dotted_list(value)
+        else:
+            return get_dict_from_dotted_dict(value)
+    return value
+
+
 
 # Singleton used to represent no argument passed, for when None is a valid
 # value for the arg.
@@ -232,7 +271,7 @@ def _get(d, dottedkey):
         try:
             d = d[try_int(K)]
             K_parts = []
-        except (KeyError, TypeError), e:
+        except (KeyError, TypeError, IndexError), e:
             pass
     if K_parts != []:
         raise KeyError( \
@@ -279,7 +318,7 @@ class dotted(object):
             if isinstance(value, dotted):
                 self.data = value.data
             else:
-                self.data = get_dict_from_dotted_dict(value)
+                self.data = get_dict_from_dotted(value)
             
     def get(self, dottedkey, default=None):
         """ Get the dottedkey """
@@ -354,7 +393,7 @@ class dotted(object):
                 if prefix:
                     dkey = '%s.%s'% (prefix, n)
                 else:
-                    dkey = n
+                    dkey = str(n)
                 self.dottedkeys(value=v, store=store, prefix=dkey)
         return store
                 

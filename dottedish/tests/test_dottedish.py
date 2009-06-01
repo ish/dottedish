@@ -16,6 +16,9 @@ class TestDottedDict(unittest.TestCase):
         ]
     test_dictlist_data = [
         ( {'a.a.0':1, 'a.a.1':3, 'a.b':2}, {'a':{'a':[1,3], 'b':2}} ),
+        ( {'0':1, '1':3}, [1,3] ),
+        ( {'0.a':1, '1':3}, [{'a':1},3] ),
+        ( {'0.a':1}, [{'a':1}] ),
    
     ]
     test_error = [
@@ -88,6 +91,7 @@ class TestDottedDict(unittest.TestCase):
         ( {'a':{'a':[1,3], 'b':2}}, ( ('a.a.0',1),('a.a.1',3) ) ),
         ( {'a':{'a':[1, {'a':7}], 'b':2}}, ( ('a.a.0',1),('a.a.1.a',7) ) ),
         ( {'list': [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]}, ( ('list.0.a',1), ) ),
+        ( [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}], ( ('0.a',1), ) ),
         
         ]
         for d, checkers  in tests:
