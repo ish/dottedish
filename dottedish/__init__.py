@@ -265,10 +265,12 @@ def _get(d, dottedkey):
     """ get a dottedkey value from a dottedict """
     keys = str(dottedkey).split('.')
     K_parts = []
-    for n, key in enumerate(keys):
+    for key in keys:
         K_parts.append(key)
         K = '.'.join(K_parts)
         try:
+            if is_int(K) and isinstance(d, basestring):
+                break
             d = d[try_int(K)]
             K_parts = []
         except (KeyError, TypeError, IndexError), e:
