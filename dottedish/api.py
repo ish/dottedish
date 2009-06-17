@@ -1,4 +1,4 @@
-__all__ = ['dotted', 'set', 'get']
+__all__ = ['dotted', 'set', 'get', 'flatten']
 
 
 from simplegeneric import generic
@@ -18,6 +18,22 @@ def set(o, key, value):
 
 def get(o, key, default=_sentinel):
     return wrap(_get(o, key, default))
+
+def flatten(o):
+    stack = [(iter(wrap(o).items()), None)]
+    while stack:
+        items_iter, parent_key = stack[-1]
+        for (key, value) in items_iter:
+            if parent_key is None:
+                full_key = key
+            else:
+                full_key = '.'.join([parent_key, key])
+            if value is not unwrap(value):
+                stack.append((iter(value.items()), full_key))
+                break
+            yield full_key, value
+        else:
+            stack.pop()
 
 
 ##
