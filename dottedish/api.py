@@ -1,3 +1,6 @@
+__all__ = ['dotted', 'set', 'get']
+
+
 from simplegeneric import generic
 
 
@@ -15,6 +18,7 @@ def set(o, key, value):
 
 def get(o, key, default=_sentinel):
     return wrap(_get(o, key, default))
+
 
 ##
 # Extension API.
@@ -35,9 +39,9 @@ def wrap(o):
 def unwrap(o):
     return o
 
+
 ##
 # Internal implemenation.
-#
 
 def _parent_and_key(o, key):
     key = key.split('.')
