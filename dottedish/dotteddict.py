@@ -18,8 +18,13 @@ class DottedDict(object):
         self._o = o
 
     def __setitem__(self, key, value):
-        return api.set(self._o, key, value)
+        return api.set(self._o, key, api.unwrap(value))
 
     def __getitem__(self, key):
         return api.get(self._o, key)
+
+
+@api.unwrap.when_type(DottedDict)
+def unwrap_dict(o):
+    return o._o
 

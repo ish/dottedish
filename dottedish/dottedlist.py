@@ -21,8 +21,12 @@ class DottedList(object):
         self._o = o
 
     def __setitem__(self, key, value):
-        return api.set(self._o, key, value)
+        return api.set(self._o, key, api.unwrap(value))
 
     def __getitem__(self, key):
         return api.get(self._o, key)
+
+@api.unwrap.when_type(DottedList)
+def unwrap_list(o):
+    return o._o
 

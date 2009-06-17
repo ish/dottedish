@@ -17,19 +17,6 @@ def set(o, key, value):
 def get(o, key, default=None):
     return wrap(_get(o, key, default))
 
-def del(o, key):
-
-def _get(o, key, default=None):
-    sentinel = object()
-    key = key.split('.')
-    parent_key, item_key = key[:-1], key[-1]
-    for k in parent_key:
-        o = getitem(o, k, sentinel)
-        if o is sentinel:
-            raise KeyError(k)
-    return getitem(o, item_key, default)
-
-
 ##
 # Extension API.
 
@@ -44,4 +31,21 @@ def getitem(o, key, default):
 @generic
 def wrap(o):
     return o
+
+@generic
+def unwrap(o):
+    return o
+
+##
+# Internal implementation.
+
+def _get(o, key, default=None):
+    sentinel = object()
+    key = key.split('.')
+    parent_key, item_key = key[:-1], key[-1]
+    for k in parent_key:
+        o = getitem(o, k, sentinel)
+        if o is sentinel:
+            raise KeyError(k)
+    return getitem(o, item_key, default)
 
