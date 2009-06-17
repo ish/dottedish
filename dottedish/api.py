@@ -1,4 +1,4 @@
-__all__ = ['dotted', 'set', 'get', 'flatten']
+__all__ = ['dotted', 'set', 'get', 'flatten', 'unflatten']
 
 
 from simplegeneric import generic
@@ -10,7 +10,13 @@ from simplegeneric import generic
 _sentinel = object()
 
 def dotted(o):
-    return wrap(o)
+    """
+    Return an object that support dotted key access.
+    """
+    wrapped = wrap(o)
+    if o is wrapped:
+        raise TypeError()
+    return wrapped
 
 def set(o, key, value):
     parent, key = _parent_and_key(o, key)
@@ -34,6 +40,15 @@ def flatten(o):
             yield full_key, value
         else:
             stack.pop()
+
+def unflatten(l):
+    root = {}
+    for (key, value) in l:
+        key = key.split('.')
+        container_key, item_key = key[:-1], key[-1]
+        container = reduce(lambda container, key: container.setdefault(key, {}), container_key, root)
+        container[item_key] = value
+    return root
 
 
 ##
