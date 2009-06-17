@@ -27,11 +27,17 @@ class DottedList(object):
         return api.get(self._o, key)
 
     def keys(self):
-        return [str(i) for i in xrange(len(self._o))]
+        return list(self.iterkeys())
+
+    def iterkeys(self):
+        return (str(i) for i in xrange(len(self._o)))
 
     def items(self):
-        return [(str(i), api.wrap(value))
-                for (i, value) in enumerate(self._o)]
+        return list(self.iteritems())
+
+    def iteritems(self):
+        return ((str(i), api.wrap(value))
+                for (i, value) in enumerate(self._o))
 
 @api.unwrap.when_type(DottedList)
 def unwrap_list(o):

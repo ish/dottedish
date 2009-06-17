@@ -26,7 +26,7 @@ def get(o, key, default=_sentinel):
     return wrap(_get(o, key, default))
 
 def flatten(o):
-    stack = [(iter(wrap(o).items()), None)]
+    stack = [(wrap(o).iteritems(), None)]
     while stack:
         items_iter, parent_key = stack[-1]
         for (key, value) in items_iter:

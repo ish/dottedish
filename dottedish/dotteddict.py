@@ -24,11 +24,17 @@ class DottedDict(object):
         return api.get(self._o, key)
 
     def keys(self):
-        return [str(key) for key in self._o.iterkeys()]
+        return list(self.iterkeys())
+
+    def iterkeys(self):
+        return (str(key) for key in self._o.iterkeys())
 
     def items(self):
-        return [(str(key), api.wrap(value))
-                for (key, value) in self._o.iteritems()]
+        return list(self.iteritems())
+
+    def iteritems(self):
+        return ((str(key), api.wrap(value))
+                for (key, value) in self._o.iteritems())
 
 @api.unwrap.when_type(DottedDict)
 def unwrap_dict(o):
