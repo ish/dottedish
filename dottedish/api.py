@@ -19,13 +19,23 @@ def dotted(o):
     return wrapped
 
 def set(o, key, value):
+    """
+    Set the item with the given dotted key to the given value.
+    """
     parent, key = _parent_and_key(o, key)
     setitem(parent, key, value)
 
 def get(o, key, default=_sentinel):
+    """
+    Get the item with the given dotted key.
+    """
     return wrap(_get(o, key, default))
 
 def flatten(o):
+    """
+    Flatten an object graph into a sequence of (key, value) pairs where key is
+    a nested key with segments separated by a '.'.
+    """
     stack = [(wrap(o).iteritems(), None)]
     while stack:
         items_iter, parent_key = stack[-1]
@@ -42,6 +52,13 @@ def flatten(o):
             stack.pop()
 
 def unflatten(l):
+    """
+    Expand a flattened list into a graph of dictionaries.
+
+    Note: By default, this will not reverse the result of flatten() if the
+    flattened object contained any lists as there is no information in a key
+    such as 'foo.0' to say if the container 'foo' is a dict or a list.
+    """
     root = {}
     for (key, value) in l:
         key = key.split('.')
