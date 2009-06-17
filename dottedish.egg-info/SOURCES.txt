@@ -1,6 +1,9 @@
 README
 setup.py
 dottedish/__init__.py
+dottedish/api.py
+dottedish/dotteddict.py
+dottedish/dottedlist.py
 dottedish.egg-info/PKG-INFO
 dottedish.egg-info/SOURCES.txt
 dottedish.egg-info/dependency_links.txt
@@ -9,4 +12,6 @@ dottedish.egg-info/requires.txt
 dottedish.egg-info/top_level.txt
 dottedish.egg-info/zip-safe
 dottedish/tests/__init__.py
-dottedish/tests/test_dottedish.py
+dottedish/tests/test_api.py
+dottedish/tests/test_dotteddict.py
+dottedish/tests/test_dottedlist.py

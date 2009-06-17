@@ -24,8 +24,7 @@ setup(name='dottedish',
       include_package_data=True,
       zip_safe=True,
       install_requires=[
-          # -*- Extra requirements: -*-
-          "WebOb",
+          "simplegeneric",
       ],
       entry_points="""
       # -*- Entry points: -*-

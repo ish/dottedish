@@ -4,17 +4,16 @@ from simplegeneric import generic
 ##
 # High-level API.
 
+_sentinel = object()
+
 def dotted(o):
     return wrap(o)
 
 def set(o, key, value):
-    key = key.split('.')
-    parent_key, item_key = key[:-1], key[-1]
-    if parent_key:
-        o = _get(o, '.'.join(parent_key))
-    setitem(o, item_key, value)
+    parent, key = _parent_and_key(o, key)
+    setitem(parent, key, value)
 
-def get(o, key, default=None):
+def get(o, key, default=_sentinel):
     return wrap(_get(o, key, default))
 
 ##
@@ -25,7 +24,7 @@ def setitem(o, key, value):
     raise NotImplementedError()
 
 @generic
-def getitem(o, key, default):
+def getitem(o, key):
     raise NotImplementedError()
 
 @generic
@@ -37,15 +36,26 @@ def unwrap(o):
     return o
 
 ##
-# Internal implementation.
+# Internal implemenation.
+#
 
-def _get(o, key, default=None):
-    sentinel = object()
+def _parent_and_key(o, key):
+    key = key.split('.')
+    parent_key, item_key = key[:-1], key[-1]
+    if parent_key:
+        o = _get(o, '.'.join(parent_key))
+    return o, item_key
+
+def _get(o, key, default=_sentinel):
     key = key.split('.')
     parent_key, item_key = key[:-1], key[-1]
     for k in parent_key:
-        o = getitem(o, k, sentinel)
-        if o is sentinel:
-            raise KeyError(k)
-    return getitem(o, item_key, default)
+        o = getitem(o, k)
+    try:
+        return getitem(o, item_key)
+    except KeyError:
+        if default is _sentinel:
+            raise
+        else:
+            return default
 
