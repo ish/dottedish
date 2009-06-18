@@ -23,6 +23,12 @@ class DottedDict(object):
     def __getitem__(self, key):
         return api.get(self._o, key)
 
+    def get(self, key, default=None):
+        return api.get(self._o, key, default=default)
+
+    def __len__(self):
+        return len(self._o)
+
     def keys(self):
         return list(self.iterkeys())
 
@@ -35,6 +41,15 @@ class DottedDict(object):
     def iteritems(self):
         return ((str(key), api.wrap(value))
                 for (key, value) in self._o.iteritems())
+
+    def __eq__(self,other):
+        if isinstance(other, DottedDict):
+            return self._o == other._o
+        return self._o == other
+
+    def __iter__(self):
+        for k in self._o:
+            yield k
 
 @api.unwrap.when_type(DottedDict)
 def unwrap_dict(o):

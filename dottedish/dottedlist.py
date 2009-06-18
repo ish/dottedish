@@ -33,6 +33,12 @@ class DottedList(object):
     def __getitem__(self, key):
         return api.get(self._o, key)
 
+    def get(self, key, default=None):
+        return api.get(self._o, key, default=default)
+
+    def __len__(self):
+        return len(self._o)
+
     def keys(self):
         return list(self.iterkeys())
 
@@ -45,6 +51,15 @@ class DottedList(object):
     def iteritems(self):
         return ((str(i), api.wrap(value))
                 for (i, value) in enumerate(self._o))
+
+    def __eq__(self,other):
+        if isinstance(other, DottedList):
+            return self._o == other._o
+        return self._o == other
+
+    def __iter__(self):
+        for v in self._o:
+            yield api.wrap(v)
 
 @api.unwrap.when_type(DottedList)
 def unwrap_list(o):

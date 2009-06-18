@@ -26,6 +26,7 @@ def set(o, key, value, container_factory=None):
     """
     # Unwrap in case it's already a dotted.
     o = unwrap(o)
+    key = str(key)
     parent, key = _parent_and_key(o, key, container_factory=container_factory)
     setitem(parent, key, value)
 
@@ -35,6 +36,7 @@ def get(o, key, default=_sentinel):
     """
     # Unwrap in case it's already a dotted.
     o = unwrap(o)
+    key = str(key)
     return wrap(_get(o, key, default))
 
 def flatten(o):
