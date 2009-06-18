@@ -32,6 +32,12 @@ class TestAPI(unittest.TestCase):
         dd = api.dotted(d)
         self.assertTrue(isinstance(dd, dotteddict.DottedDict))
 
+    def test_wrap_dotted(self):
+        d = {}
+        dd = api.dotted(d)
+        self.assertTrue(isinstance(dd, dotteddict.DottedDict))
+        self.assertTrue(dd is api.dotted(dd))
+
 
 class TestDottedDict(unittest.TestCase):
 

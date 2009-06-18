@@ -14,7 +14,9 @@ def dotted(o):
     Return an object that support dotted key access.
     """
     wrapped = wrap(o)
-    if o is wrapped:
+    # Check that something has actually registered for this type, i.e. we
+    # didn't just get wrap's default behaviour.
+    if o is wrapped and not wrap.has_type(type(unwrap(o))):
         raise TypeError()
     return wrapped
 
