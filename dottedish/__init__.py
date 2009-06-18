@@ -29,9 +29,10 @@ def _set_dict(data, keys, value, overwrite=False):
     if len(keys) == 1:
         key = try_int(keys[0])
         if is_int(key):
+            key = int(key)
             if isinstance(data, dict) and len(data.keys()) == 0 and key == 0:
-                data = [value]
-            elif isinstance(data, list) and key == len(data):
+                data = []
+            if isinstance(data, list) and key == len(data):
                 data.append(value)
             elif isinstance(data, list) and key > len(data):
                 for i in xrange(len(data), key):
@@ -53,8 +54,7 @@ def _set_dict(data, keys, value, overwrite=False):
                 if overwrite is True:
                     data = {keys[0]: value}
                 else:
-                    raise KeyError( \
-                'Already assigned data key %s value %s'%(keys[0], data))
+                    raise KeyError( 'Already assigned data key %s value %s'%(keys[0], data))
     else:
         if is_int(keys[0]):
             if isinstance(data, list) or \
@@ -68,11 +68,9 @@ def _set_dict(data, keys, value, overwrite=False):
                     # a list...
                     if len(data) == 0:
                         data = [{}]
-                    d = _set_dict(data[try_int(keys[0])], \
-                                 keys[1:], value, overwrite=overwrite) 
+                    d = _set_dict(data[try_int(keys[0])], keys[1:], value, overwrite=overwrite) 
                 if len(data)>try_int(keys[0]):
-                    d = _set_dict(data[try_int(keys[0])], \
-                                 keys[1:], value, overwrite=overwrite) 
+                    d = _set_dict(data[try_int(keys[0])], keys[1:], value, overwrite=overwrite) 
                 elif len(data) == try_int(keys[0]):
                     o = _set_dict({}, keys[1:], value, overwrite=overwrite)
                     data.append( o )
@@ -82,12 +80,10 @@ def _set_dict(data, keys, value, overwrite=False):
             else:
                 raise KeyError
         else:
-            if isinstance(data, dict) and \
-             data.has_key(keys[0]) and not \
-              isinstance(data[keys[0]],dict) and overwrite is True:
+            if isinstance(data, dict) and  data.has_key(keys[0]) and not  isinstance(data[keys[0]],dict) and overwrite is True:
                 data[keys[0]] = {}
-            d = _set_dict(_setdefault(data, keys[0], {}), \
-                         keys[1:], value, overwrite=overwrite)
+            s = _setdefault(data, keys[0], {})
+            d = _set_dict(s, keys[1:], value, overwrite=overwrite)
         data[try_int(keys[0])] = d
     return data
 
@@ -210,6 +206,7 @@ def _setdefault(data, dottedkey, default=NOARG):
     # on
     keys = str(dottedkey).split('.')
     lastleaf = data
+    lastkey = dottedkey
     K = None
     # Loop on the list of keys up to the next to last one (we already checked
     # the last one at the start of the run)
@@ -250,15 +247,7 @@ def _setdefault(data, dottedkey, default=NOARG):
 def _set(data, dottedkey, value):
     """ Set a dotted key on a dotted dict """
     keys = str(dottedkey).split('.')
-    d = data
-    try:
-        for n, key in enumerate(keys[:-1]):
-            d = d[try_int(key)]
-    except KeyError, e:
-        raise KeyError(
-            'Error accessing dotted key %s on %r. Only got to %s'% \
-            (dottedkey,data,'.'.join(keys[:n])))
-    d[try_int(keys[-1])] = value
+    _set_dict(data, keys, value)
     return data
 
 def _get(d, dottedkey):
@@ -346,6 +335,8 @@ class dotted(object):
         
     def __setitem__(self, dottedkey, value):
         """ implement the dict setitem """
+        if dottedkey.startswith('0') and self.data == {}:
+            self.data = []
         _setdefault(self.data, dottedkey, value)
         _set(self.data, dottedkey, value)
         
@@ -422,6 +413,9 @@ class dotted(object):
                 raise KeyError('Dotted key \'%s\' does not exist'%key)
         except AttributeError, e:
             raise KeyError(e.message)
+
+    def __iter__(self):
+        return iter(self.keys())
         
     def has_key(self, key):
         """ does the key exist """
@@ -430,6 +424,9 @@ class dotted(object):
     def __contains__(self, key):
         """ is this key in the dict """
         return key in self.keys()
+
+    def __len__(self):
+        return len(self.data)
 
     def has_dottedkey(self, dottedkey):
         """ does this dotted key exist """

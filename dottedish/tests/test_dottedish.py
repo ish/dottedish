@@ -26,6 +26,14 @@ class TestDottedDict(unittest.TestCase):
     ]
     
 
+    def test_setlist(self):
+        l = dotted()
+        l['0'] = 7
+        assert l.data == [7]
+        l = dotted()
+        l['0.0'] = 7
+        assert l.data == [[7]]
+
 
     def test_convert(self):
         """Just checking that converting results in assigning the right dict """
@@ -167,6 +175,11 @@ class TestDottedDict(unittest.TestCase):
         for data, dottedkey, value in tests:
             _setdefault(data, dottedkey, testval)
             self.assertEquals(data, value)
+
+    def test_enumerate_empty_dict(self):
+        d = dotted()
+        l = list(enumerate(d))
+        assert l == []
         
             
 if __name__ == "__main__":
