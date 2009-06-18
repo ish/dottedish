@@ -65,3 +65,13 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(api.unflatten(data) == {'foo': {'0': 'bar'}})
         self.assertTrue(api.unflatten(data, container_factory=container_factory) == {'foo': ['bar']})
 
+    def test_set_dotted(self):
+        d = {}
+        dd = api.dotted(d)
+        api.set(dd, 'foo', 1)
+
+    def test_get_dotted(self):
+        d = {'foo': 'bar'}
+        dd = api.dotted(d)
+        self.assertTrue(api.get(dd, 'foo') == 'bar')
+

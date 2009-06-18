@@ -24,6 +24,8 @@ def set(o, key, value, container_factory=None):
     """
     Set the item with the given dotted key to the given value.
     """
+    # Unwrap in case it's already a dotted.
+    o = unwrap(o)
     parent, key = _parent_and_key(o, key, container_factory=container_factory)
     setitem(parent, key, value)
 
@@ -31,6 +33,8 @@ def get(o, key, default=_sentinel):
     """
     Get the item with the given dotted key.
     """
+    # Unwrap in case it's already a dotted.
+    o = unwrap(o)
     return wrap(_get(o, key, default))
 
 def flatten(o):
