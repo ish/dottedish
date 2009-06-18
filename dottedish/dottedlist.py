@@ -2,7 +2,14 @@ from dottedish import api
 
 @api.setitem.when_type(list)
 def setitem_list(o, key, value):
-    o[int(key)] = value
+    # Allow a new item to be appended to the list by setting the next item.
+    # XXX I think this is a hack to allow lists to created and filled during
+    # unflatten. Personally, I would much, much rather see the unflattened
+    # graph treated as a nested mapping.
+    if int(key) == len(o):
+        o.append(value)
+    else:
+        o[int(key)] = value
 
 @api.getitem.when_type(list)
 def getitem_list(o, key):

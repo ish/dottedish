@@ -18,11 +18,11 @@ def dotted(o):
         raise TypeError()
     return wrapped
 
-def set(o, key, value):
+def set(o, key, value, container_factory=None):
     """
     Set the item with the given dotted key to the given value.
     """
-    parent, key = _parent_and_key(o, key)
+    parent, key = _parent_and_key(o, key, container_factory=container_factory)
     setitem(parent, key, value)
 
 def get(o, key, default=_sentinel):
@@ -35,6 +35,11 @@ def flatten(o):
     """
     Flatten an object graph into a sequence of (key, value) pairs where key is
     a nested key with segments separated by a '.'.
+
+    Note: flattening an object graph is a lossy process - there is no way to
+    reverse the process reliably without help. Dotted key segments are strings
+    and there is no way to know if a '0' segment represents a key in a dict or
+    an index in a list.
     """
     stack = [(wrap(o).iteritems(), None)]
     while stack:
@@ -51,7 +56,7 @@ def flatten(o):
         else:
             stack.pop()
 
-def unflatten(l):
+def unflatten(l, container_factory=None):
     """
     Expand a flattened list into a graph of dictionaries.
 
@@ -59,12 +64,11 @@ def unflatten(l):
     flattened object contained any lists as there is no information in a key
     such as 'foo.0' to say if the container 'foo' is a dict or a list.
     """
+    if container_factory is None:
+        container_factory = lambda p, c: {}
     root = {}
     for (key, value) in l:
-        key = key.split('.')
-        container_key, item_key = key[:-1], key[-1]
-        container = reduce(lambda container, key: container.setdefault(key, {}), container_key, root)
-        container[item_key] = value
+        set(root, key, value, container_factory=container_factory)
     return root
 
 
@@ -91,11 +95,22 @@ def unwrap(o):
 ##
 # Internal implemenation.
 
-def _parent_and_key(o, key):
+def _parent_and_key(o, key, container_factory):
     key = key.split('.')
     parent_key, item_key = key[:-1], key[-1]
-    if parent_key:
-        o = _get(o, '.'.join(parent_key))
+    for i in range(len(parent_key)):
+        container_key = parent_key[:(i+1)]
+        try:
+            o = getitem(o, container_key[-1])
+        except KeyError:
+            if container_factory is None:
+                raise
+            if len(container_key) == len(parent_key):
+                container = container_factory('.'.join(container_key), item_key)
+            else:
+                container = container_factory('.'.join(container_key), parent_key[i+1])
+            setitem(o, container_key[-1], container)
+            o = container
     return o, item_key
 
 def _get(o, key, default=_sentinel):

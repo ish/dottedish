@@ -18,6 +18,25 @@ class TestAPI(unittest.TestCase):
     def test_getitem_no_impl(self):
         self.assertRaises(NotImplementedError, api.get, '', 'foo')
 
+    def test_set_container_factory(self):
+        # No container factory.
+        d = {}
+        self.assertRaises(KeyError, api.set, d, 'foo.0', 'bar')
+        # dict container factory
+        d = {}
+        def container_factory(parent_key, item_key):
+            return {}
+        api.set(d, 'foo.0.bar', 'fum', container_factory=container_factory)
+        self.assertTrue(d == {'foo': {'0': {'bar': 'fum'}}})
+        # list for ints container factory
+        d = {}
+        def container_factory(parent_key, item_key):
+            if item_key.isdigit():
+                return []
+            return {}
+        api.set(d, 'foo.0.bar', 'fum', container_factory=container_factory)
+        self.assertTrue(d == {'foo': [{'bar': 'fum'}]})
+
     def test_flatten(self):
         for (test, result) in [
             ({}, []),
@@ -36,4 +55,13 @@ class TestAPI(unittest.TestCase):
             ({'foo': {'bar': {'0': 10, '1': 11, '2': 12, '3': {'wibble': {'0': 'm', '1': 'a', '2': 't', '3': 't'}}}}},
              [('foo.bar.0', 10), ('foo.bar.1', 11), ('foo.bar.2', 12), ('foo.bar.3.wibble.0', 'm'), ('foo.bar.3.wibble.1', 'a'), ('foo.bar.3.wibble.2', 't'), ('foo.bar.3.wibble.3', 't')])]:
             self.assertTrue(api.unflatten(test) == result)
+
+    def test_unflatten_container_factory(self):
+        def container_factory(parent_key, item_key):
+            if item_key.isdigit():
+                return []
+            return {}
+        data = [('foo.0', 'bar')]
+        self.assertTrue(api.unflatten(data) == {'foo': {'0': 'bar'}})
+        self.assertTrue(api.unflatten(data, container_factory=container_factory) == {'foo': ['bar']})
 
