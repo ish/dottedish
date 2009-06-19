@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.5'
+version = '0.6'
 
 setup(name='dottedish',
       version=version,
@@ -24,8 +24,7 @@ setup(name='dottedish',
       include_package_data=True,
       zip_safe=True,
       install_requires=[
-          # -*- Extra requirements: -*-
-          "WebOb",
+          "simplegeneric",
       ],
       entry_points="""
       # -*- Entry points: -*-

@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: dottedish
-Version: 0.5
+Version: 0.6
 Summary: A dotted key accessor that handles numeric keys for list entries
 Home-page: http://ish.io/projects/show/dottedish
 Author: Tim Parkin, Matt Goodall
