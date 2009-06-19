@@ -17,7 +17,7 @@ def dotted(o):
     # Check that something has actually registered for this type, i.e. we
     # didn't just get wrap's default behaviour.
     if o is wrapped and not wrap.has_type(type(unwrap(o))):
-        raise TypeError()
+        raise TypeError(type(o))
     return wrapped
 
 def set(o, key, value, container_factory=None):
@@ -124,9 +124,9 @@ def _parent_and_key(o, key, container_factory):
 def _get(o, key, default=_sentinel):
     key = key.split('.')
     parent_key, item_key = key[:-1], key[-1]
-    for k in parent_key:
-        o = getitem(o, k)
     try:
+        for k in parent_key:
+            o = getitem(o, k)
         return getitem(o, item_key)
     except KeyError:
         if default is _sentinel:

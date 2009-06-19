@@ -1,6 +1,8 @@
 import unittest
 from dottedish import api, dotteddict
 
+def container_factory(parent_key, item_key):
+    return {}
 
 class TestAPI(unittest.TestCase):
 
@@ -14,7 +16,9 @@ class TestAPI(unittest.TestCase):
         api.set(d, 'foo.bar', 'rab')
         self.assertTrue(d == {'foo': {'bar': 'rab'}})
         # Test traversal key error.
-        self.assertRaises(KeyError, api.set, {'foo': {}}, 'oof.bar', 'rab')
+        d = {'foo': {}}
+        api.set(d, 'oof.bar','rab', container_factory=container_factory)
+        self.assertTrue(d == {'foo': {},'oof': {'bar':'rab'}})
 
     def test_get(self):
         self.assertTrue(api.get({'foo': 'bar'}, 'foo') == 'bar')
@@ -25,7 +29,7 @@ class TestAPI(unittest.TestCase):
     def test_get_default(self):
         self.assertTrue(api.get({}, 'foo', 'bar') == 'bar')
         self.assertTrue(api.get({'foo': {}}, 'foo.bar', 'rab') == 'rab')
-        self.assertRaises(KeyError, api.get, {'foo': 'bar'}, 'oof.bar', None)
+        self.assertTrue(api.get({'foo': 'bar'}, 'oof.bar', None) == None)
 
     def test_wrap(self):
         d = {}

@@ -61,6 +61,9 @@ class DottedList(object):
         for v in self._o:
             yield api.wrap(v)
 
+    def __contains__(self, key):
+        return key in self._o
+
 @api.unwrap.when_type(DottedList)
 def unwrap_list(o):
     return o._o

@@ -1,4 +1,5 @@
 from dottedish import api
+from UserDict import UserDict
 
 @api.setitem.when_type(dict)
 def setitem_dict(o, key, value):
