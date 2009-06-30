@@ -64,6 +64,9 @@ class DottedList(object):
     def __contains__(self, key):
         return key in self._o
 
+    def __repr__(self):
+        return '<DottedList "%r">'%self._o
+
 @api.unwrap.when_type(DottedList)
 def unwrap_list(o):
     return o._o
